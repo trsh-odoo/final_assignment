@@ -5,6 +5,9 @@
 <!-- action for stock picking batch views -->
         <record id="stock_picking_batch.stock_picking_batch_action" model="ir.actions.act_window">
             <field name="view_mode">tree,form,kanban,graph,gantt</field>
+            <field name="context">{
+            'graph_groupbys':['scheduled_date:day','vehicle_category_id'],
+            }</field>
         </record>
 
 <!-- inherited form view -->
@@ -15,44 +18,49 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name ='scheduled_date']" position="replace">
                     <field name="dock_id" placeholder="Dock A" />
-                    <field name="vehicle" placeholder="Opel GJ45XC1234" />
-                    <field name="vehicle_category" placeholder="Semi-Truck (250kg, 30m³)"/>
-                    <field name="weight" string ="total weight" invisible="not vehicle_category"/>
-                    <field name="weight_percent" widget="progressbar" invisible="not vehicle_category"/>
-                    <field name="volume" string ="total volume" invisible="not vehicle_category"/>
-                    <field name="volume_percent" widget="progressbar" invisible="not vehicle_category"/>
+                    <field name="vehicle_id" placeholder="Opel GJ45XC1234" />
+                    <field name="vehicle_category_id" placeholder="Semi-Truck (250kg, 30m³)"/>
+                <label for='weight' invisible = "not vehicle_category_id"/>
+                    <div class='d-flex flex-row justify-content-between' invisible = "not vehicle_category_id">
+                        <div class='d-flex flex-row gap-2'>
+                            <div class='d-flex flex-row gap-1'>
+                                <field name='weight'/>
+                                <span>kg</span>
+                            </div>
+                            <field name='weight_percent' widget='progressbar' />
+                        </div>
+                    </div>
+
+                    
+                <label for='volume' invisible = "not vehicle_category_id"/>
+                    <div class='d-flex flex-row justify-content-between' invisible = "not vehicle_category_id">
+                        <div class='d-flex flex-row gap-2'>
+                            <div class='d-flex flex-row gap-1'>
+                                <field name='volume'/>
+                                <span>m³</span>
+                            </div>
+                            <field name='volume_percent' widget='progressbar' />
+                        </div>
+                    </div>
+
                 </xpath>
             </field>
         </record>
 
-<!-- inherited tree view -->
 
-        <record id = 'stock_picking_batch_tree_inherit' model = 'ir.ui.view'>
-            <field name="name">stock.picking.batch.tree.inherit</field>
-            <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.vpicktree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//tree/field[@name='origin']" position="after">
-                    <field name="volume"/>
-                    <field name="weight"/>
-
-                </xpath>
-            </field>
-        </record>
 
 <!-- graph view -->
         <record id="stock_picking_batch_graph_view" model="ir.ui.view">
             <field name="name">stock.picking.batch.graph.view</field>
             <field name="model">stock.picking.batch</field>
-
             <field name="arch" type="xml">
                 <graph string="batch transfer" type="bar">
                     <field name="scheduled_date" string="days" type="row"/>
-                    <field name="vehicle_category" string="vehicle category" />
-                    <field name="weight" string="Weight" type="count" />
-                    <field name="volume" string="Volume" type="count" />
-                    <field name="number_of_line" string="# lines" type="count" />
-                    <field name="number_of_transfers" string="# transfers" type="count" />
+                    <field name="vehicle_category_id" string="vehicle category" />
+                    <field name="weight" string="Weight" type="measure" />
+                    <field name="volume" string="Volume" type="measure" />
+                    <!-- <field name="lines" string="# Lines" type="measure" />
+                    <field name="transfers" string="#Transfers" type="measure"/> -->
                 </graph>
             </field>
         </record>
@@ -67,15 +75,14 @@
                 date_start="scheduled_date" 
                 decoration-success="state == 'done'" 
                 decoration-info="state == 'draft'"
-                color="vehicle"
-                default_group_by="dock_id,vehicle_category">
+                color="vehicle_id"
+                default_group_by="dock_id,vehicle_category_id">
                     <templates>
                         <div t-name="gantt-popover-details">
                             <field name="name"/>
                             <field name="state"/>
                         </div>
                     </templates> 
-            
                 </gantt>
             </field>
         </record>

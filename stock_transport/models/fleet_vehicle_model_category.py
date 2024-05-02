@@ -5,7 +5,7 @@ from odoo import api,fields, models
 
 class FleetVehicleModelCategory(models.Model):
     
-    _inherit = "fleet.vehicle.model.category" # extending inheritance
+    _inherit = "fleet.vehicle.model.category" 
     _description = "extended fleet vehicle model category"
     
     max_weight = fields.Float(string= "Max Weight (Kg)")
